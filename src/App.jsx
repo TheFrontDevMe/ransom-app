@@ -53,7 +53,7 @@ function App() {
           {/* Main Dashboard */}
           <div className="flex min-h-0 flex-col gap-4">
             <Header />
-            <div className="grid min-h-0 grid-cols-2 gap-1.5">
+            <div className="grid min-h-0 flex-grow grid-cols-2 gap-1.5">
               <CompaniesSection />
 
               <CompanyInfoSection />

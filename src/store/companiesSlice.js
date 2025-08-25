@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   companiesToShow: "all", // "all", || "awaiting" || "published"
   selectedCompanyId: null,
-  companyInfoActiveTab: "storage",
+  companyInfoActiveTab: "overview",
 };
 
 const companiesSlice = createSlice({

@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
 
 import { formatValueWithDots } from "@/lib/utils";
+import { useCountdown } from "@/lib/hooks/useCountdown";
 
 import CountryFlagAndName from "@components/ui/CountryFlagAndName";
 import CompanyPublishedBadge from "@components/ui/CompanyPublishedBadge";
-import { useCountdown } from "@/lib/hooks/useCountdown";
 
 function CompanyInfoOverview() {
   const { selectedCompanyId } = useSelector((state) => state.companies);
@@ -28,13 +28,20 @@ function CompanyInfoOverview() {
     stocks = null,
   } = selectedCompany || {};
 
-  const countdown = useCountdown(timer_expiry);
+  const { countdown } = useCountdown(timer_expiry);
 
-  if (!selectedCompany) return null;
+  if (!selectedCompany)
+    return (
+      <div className="mt-4 ml-4 flex-grow bg-[#0c0c0c]">
+        <div className="flex h-full w-full items-center justify-center">
+          <h3 className="text-[21px] text-white">Select a company</h3>
+        </div>
+      </div>
+    );
 
   return (
-    <div className="custom-scrollbar mt-4 overflow-auto pr-2.5 pl-4">
-      <div className="flex flex-col gap-3 bg-[#0c0c0c] py-2">
+    <div className="custom-scrollbar mt-4 h-full overflow-auto pr-2.5 pl-4">
+      <div className="flex h-full flex-col gap-3 bg-[#0c0c0c] py-2">
         {/* Description */}
         <div className="border-gray-primary flex flex-col gap-3 border-b border-dashed pb-3">
           <h4 className="pl-3 text-[10px]">Description::</h4>
@@ -95,7 +102,7 @@ function CompanyInfoOverview() {
         {/* Status & Updated at */}
         <div className="flex gap-14">
           {/* Status */}
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col justify-between gap-2.5">
             <h4 className="pl-3 text-[10px]">Status::</h4>
             <div className="pl-5">
               {is_published ? (
@@ -111,7 +118,7 @@ function CompanyInfoOverview() {
             {timer_expiry && (
               <div className="flex flex-col gap-4">
                 <h4 className="text-[10px]">Update::</h4>
-                <div className="text-[10px]">{countdown}</div>
+                <div className="text-[14px]">{countdown}</div>
               </div>
             )}
           </>

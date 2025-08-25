@@ -6,15 +6,15 @@ function CompanyPublishedBadge({ className }) {
   return (
     <div
       className={cn(
-        "border-gray-primary bg-black-primary border border-dashed p-0.5",
+        "border-gray-primary bg-black-primary border border-dashed p-1.5",
         className,
       )}
     >
-      <div className="bg-gray-primary border-gray-primary flex items-center gap-1 border p-1">
-        <span className="flsh-shrink-0">
+      <div className="bg-gray-primary border-gray-primary flex items-center gap-1 border px-2 py-1">
+        <span className="flsh-shrink-0 h-4 w-4">
           <img src={protectIcon} alt="Protect icon" />
         </span>
-        <span className="text-[10px] text-black">Published</span>
+        <span className="text-[14px] text-black">Published</span>
       </div>
     </div>
   );

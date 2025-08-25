@@ -1,6 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { setCompaniesToShow } from "@/store/companiesSlice";
+import {
+  setCompaniesToShow,
+  setSelectedCompanyId,
+} from "@/store/companiesSlice";
+import { clearFileExplorerData } from "@/store/fileExplorerSlice";
 
 import { cn } from "@/lib/utils";
 
@@ -12,25 +16,36 @@ function HeaderNavigationBlock() {
 
   const dispatch = useDispatch();
 
+  function handleNavigationItemClick(title) {
+    // // 1. Remove selected company id
+    // dispatch(setSelectedCompanyId(null));
+
+    // // 2. Clear previous company's file explorer data
+    // dispatch(clearFileExplorerData());
+
+    // // 3. Set companies to show
+    dispatch(setCompaniesToShow(title));
+  }
+
   return (
     <nav className="flex items-center gap-12">
       <NavigationItem
         title="all"
         count={awaiting + published}
         activeNavItem={companiesToShow}
-        onClick={() => dispatch(setCompaniesToShow("all"))}
+        onClick={() => handleNavigationItemClick("all")}
       />
       <NavigationItem
         title="awaiting"
         count={awaiting}
         activeNavItem={companiesToShow}
-        onClick={() => dispatch(setCompaniesToShow("awaiting"))}
+        onClick={() => handleNavigationItemClick("awaiting")}
       />
       <NavigationItem
         title="published"
         count={published}
         activeNavItem={companiesToShow}
-        onClick={() => dispatch(setCompaniesToShow("published"))}
+        onClick={() => handleNavigationItemClick("published")}
       />
     </nav>
   );

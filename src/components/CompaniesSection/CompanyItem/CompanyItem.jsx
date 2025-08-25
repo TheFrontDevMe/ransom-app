@@ -8,10 +8,9 @@ import CountryFlagAndName from "@components/ui/CountryFlagAndName";
 import CompanyPublishedBadge from "@/components/ui/CompanyPublishedBadge";
 import CompanyItemTimerBadge from "./CompanyItemTimerBadge";
 
-import companyItemBgImage from "@assets/images/bg_company-item.svg";
-
 import topLeftCornerIcon from "@assets/images/icon_corner_top-left.svg";
 import bottomLeftCornerIcon from "@assets/images/icon_corner_bottom-left.svg";
+import DashedBox from "@/components/icons/DashedBox";
 
 function CompanyItem({ companyItemData }) {
   const { selectedCompanyId } = useSelector((state) => state.companies);
@@ -22,7 +21,7 @@ function CompanyItem({ companyItemData }) {
     id,
     is_published,
     name,
-    overview,
+    overview: { description, website, files, size } = {},
     revenue,
     timer_expiry,
     views,
@@ -41,17 +40,17 @@ function CompanyItem({ companyItemData }) {
   return (
     <div
       className={cn(
-        "border-gray-primary relative cursor-pointer border border-dashed px-2.5 py-2 transition-all",
+        "relative cursor-pointer border border-dashed px-2.5 py-2 transition-all",
         selectedCompanyId === id
-          ? "bg-black-primary m-1 px-2.5 py-2"
-          : "px-4 py-3.5",
+          ? "bg-black-primary border-gray-primary m-1 px-2.5 py-2"
+          : "border-transparent px-4 py-3.5",
       )}
       onClick={handleCompanyItemClick}
     >
-      {/* //! Background image */}
-      {/* <div className="absolute inset-0 bg-cover bg-center">
-        <img src={companyItemBgImage} alt="Company item background" />
-      </div> */}
+      {/* Dashed box */}
+      {selectedCompanyId !== id && (
+        <DashedBox className="absolute inset-0 h-full w-full" />
+      )}
 
       {/* Corner Icons */}
       {selectedCompanyId === id && (
@@ -97,12 +96,41 @@ function CompanyItem({ companyItemData }) {
               <span className="text-[10px]">Views</span>
               <span className="text-[14px]">{formatValueWithDots(views)}</span>
             </div>
+            {/* Files */}
+            {is_published && (
+              <div className="flex flex-col">
+                <span className="text-[10px]">Files</span>
+                <span className="text-[14px]">
+                  {formatValueWithDots(files)}
+                </span>
+              </div>
+            )}
+            {/* Size */}
+            {is_published && (
+              <div className="flex flex-col">
+                <span className="text-[10px]">Size</span>
+                <span className="text-[14px]">{size}</span>
+              </div>
+            )}
           </div>
         </div>
         {is_published ? (
-          <CompanyPublishedBadge className="absolute top-0.5 right-1" />
+          <CompanyPublishedBadge
+            className={cn(
+              "absolute",
+              selectedCompanyId === id ? "top-0.5 right-1" : "top-1 right-2.5",
+            )}
+          />
         ) : (
-          <CompanyItemTimerBadge timerExpiry={timer_expiry} />
+          <CompanyItemTimerBadge
+            timerExpiry={timer_expiry}
+            className={cn(
+              "absolute",
+              selectedCompanyId === id
+                ? "-top-[1px] -right-[1px]"
+                : "top-0 right-1",
+            )}
+          />
         )}
       </div>
     </div>

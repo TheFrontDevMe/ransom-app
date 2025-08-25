@@ -31,7 +31,7 @@ function StorageFileExplorer({ companyId, path = "/" }) {
   if (status === "failed") return <div className="bg-[#0c0c0c]"></div>;
 
   return (
-    <div className="flex-grow bg-[#0c0c0c]">
+    <div className="ml-4 flex-grow bg-[#0c0c0c]">
       {data.length === 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <h3 className="text-[21px] text-white">No Date</h3>

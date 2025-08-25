@@ -72,17 +72,25 @@ export function getCountryData(code, locale = "en") {
 }
 
 /**
- * Converts a future timestamp into a human-readable countdown
- * format: "DDd HHh MMm" or "HHh MMm" if days = 0
+ * Returns a human-readable countdown string and an "expiring" flag
+ * from a given future timestamp.
  *
- * @param {number} expiryTimestamp - future timestamp in ms
- * @returns {string} countdown string
+ * - Format: "DDd HHh:MMm" if days remain
+ * - Format: "HHh:MMm" if < 24h
+ * - Returns ["0d 00h:00m", false] if already expired
+ *
+ * @param {number} expiryTimestamp - Future timestamp in ms (UTC)
+ * @returns {[string, boolean]} [countdownString, isExpiring]
+ *   countdownString → formatted time remaining
+ *   isExpiring → true if less than 24h remain
  */
 export function getCountdown(expiryTimestamp) {
   const now = Date.now();
   let diff = expiryTimestamp - now;
 
-  if (diff <= 0) return "0d 0h:0m";
+  if (diff <= 0) {
+    return ["0d 0h:0m", false];
+  }
 
   const minutes = Math.floor((diff / (1000 * 60)) % 60);
   const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
@@ -91,7 +99,9 @@ export function getCountdown(expiryTimestamp) {
   const pad = (n) => String(n).padStart(2, "0");
 
   if (days > 0) {
-    return `${days}d ${pad(hours)}h:${pad(minutes)}m`;
+    return [`${days}d ${pad(hours)}h:${pad(minutes)}m`, false];
   }
-  return `${pad(hours)}h:${pad(minutes)}m`;
+
+  // Less than 24 hours remaining
+  return [`${pad(hours)}h:${pad(minutes)}m`, true];
 }

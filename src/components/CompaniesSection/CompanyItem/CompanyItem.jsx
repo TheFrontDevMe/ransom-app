@@ -6,7 +6,7 @@ import { cn, formatValueWithDots } from "@/lib/utils";
 
 import CountryFlagAndName from "@components/ui/CountryFlagAndName";
 import CompanyPublishedBadge from "@/components/ui/CompanyPublishedBadge";
-import CompanyItemPinAndTimerBadge from "./CompanyItemPinAndTimerBadge";
+import CompanyItemTimerBadge from "./CompanyItemTimerBadge";
 
 import companyItemBgImage from "@assets/images/bg_company-item.svg";
 
@@ -102,7 +102,7 @@ function CompanyItem({ companyItemData }) {
         {is_published ? (
           <CompanyPublishedBadge className="absolute top-0.5 right-1" />
         ) : (
-          <CompanyItemPinAndTimerBadge timerExpiry={timer_expiry} />
+          <CompanyItemTimerBadge timerExpiry={timer_expiry} />
         )}
       </div>
     </div>

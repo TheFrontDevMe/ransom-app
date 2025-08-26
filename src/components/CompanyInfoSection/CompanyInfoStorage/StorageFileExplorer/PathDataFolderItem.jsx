@@ -12,8 +12,6 @@ function PathDataFolderItem({ name, size, mod_time, className }) {
   const { selectedCompanyId } = useSelector((state) => state.companies);
 
   function handleDirectoryClick() {
-    console.log("handleDirectoryClick", selectedCompanyId);
-
     dispath(
       changeDirectoryAndFetchCompanyStorageData({
         companyId: selectedCompanyId,

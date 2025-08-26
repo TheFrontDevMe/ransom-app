@@ -6,6 +6,7 @@ import PathDataFileItem from "./PathDataFileItem";
 import PathDataFolderItem from "./PathDataFolderItem";
 
 import ArrowReturn from "@/components/icons/ArrowReturn";
+import FileExplorerNavigateBackwardButton from "@/components/ui/FileExplorerNavigateBackwardButton";
 
 const COL_TITLES = ["Name", "Last modified", "Size"];
 
@@ -16,6 +17,7 @@ function FileExplorerPathData() {
     pathData,
     isLoading,
     success,
+    error,
   } = useSelector((state) => state.fileExplorer);
 
   const { selectedCompanyId } = useSelector((state) => state.companies);
@@ -24,13 +26,9 @@ function FileExplorerPathData() {
 
   if (isLoading) return <></>;
 
-  if (!success) return <></>;
-
   const searchedPathData = pathData.filter((item) =>
     item.name.toLowerCase().includes(searchFileNameQuery.toLowerCase()),
   );
-
-  console.log("searchedPathData", searchedPathData);
 
   return (
     <>
@@ -39,8 +37,11 @@ function FileExplorerPathData() {
         Current path: {currentDirectory === "" ? "/" : currentDirectory}
       </h3>
 
-      {pathData.length === 0 ? (
-        <h3 className="text-[21px] text-white">No Date</h3>
+      {!success ? (
+        <div className="flex flex-col items-start gap-4">
+          <FileExplorerNavigateBackwardButton />
+          <h3 className="text-[21px] text-white">No Date</h3>
+        </div>
       ) : (
         <>
           <div className="border-gray-primary grid grid-cols-[1fr_140px_45px] gap-3 border-b border-dashed p-2">

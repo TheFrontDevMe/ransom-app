@@ -1,34 +1,56 @@
-import {
-  createAsyncThunk,
-  createSelector,
-  createSlice,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import baseApiUrl from "@/lib/baseApiUrl";
 
 const initialState = {
-  dataByPath: {}, // { path: file | folder ... }
-  openFoldersByPath: {}, // { path: { folderName: true | false } }
-  loadingByPath: {}, // { path: true | false  }
-  successByPath: {}, // { path: true | false  }
-  errorByPath: {}, // { path: error | null  }
+  currentDirectory: "", // always store absolute path
+  navigationHistory: [""], // stack of visited paths
+  navigationHistoryIndex: 0, // pointer in history
+  pathData: [],
+  searchFileNameQuery: "",
+  isLoading: false,
+  success: undefined,
+  error: null,
 };
 
+// --- Helpers ---
+async function fetchStorageData(companyId, path = "/") {
+  const res = await fetch(
+    `${baseApiUrl()}?company_id=${companyId}&path=${path}`,
+  );
+
+  const { status, data } = await res.json();
+
+  return { path, status, data };
+}
+
+// --- Async thunks ---
 export const fetchCompanyStorageData = createAsyncThunk(
   "fileExplorer/fetchCompanyStorageData",
-  async ({ companyId, path = "/" }) => {
-    console.log(
-      "fetchCompanyStorageData",
-      `${baseApiUrl()}?company_id=${companyId}&path=${path}`,
-    );
+  async ({ companyId, path }) => fetchStorageData(companyId, path),
+);
 
-    const response = await fetch(
-      `${baseApiUrl()}?company_id=${companyId}&path=${path}`,
-    );
+export const changeDirectoryAndFetchCompanyStorageData = createAsyncThunk(
+  "fileExplorer/changeDirectoryAndFetchCompanyStorageData",
+  async ({ companyId, path }, { dispatch, getState }) => {
+    dispatch(goToDirectory(path === "/" ? "" : path));
+    dispatch(clearSearchFileNameQuery());
 
-    const { status, data } = await response.json();
+    const { fileExplorer } = getState();
 
-    return { path, status, data };
+    return fetchStorageData(companyId, fileExplorer.currentDirectory);
+  },
+);
+
+export const navigateBackwardAndFetchCompanyStorageData = createAsyncThunk(
+  "fileExplorer/navigateBackwardAndFetchCompanyStorageData",
+  async ({ companyId }, { dispatch, getState }) => {
+    dispatch(navigateBackward());
+    dispatch(clearSearchFileNameQuery());
+
+    const { fileExplorer } = getState();
+
+    return fetchStorageData(companyId, fileExplorer.currentDirectory);
   },
 );
 
@@ -36,52 +58,89 @@ const fileExplorerSlice = createSlice({
   name: "fileExplorer",
   initialState,
   reducers: {
-    toggleFolder: (state, action) => {
-      const { path, folderName } = action.payload;
+    goToDirectory: (state, action) => {
+      state.navigationHistory = state.navigationHistory.slice(
+        0,
+        state.navigationHistoryIndex + 1,
+      );
 
-      state.openFoldersByPath[path] = {
-        ...(state.openFoldersByPath[path] || {}),
-        [folderName]: !state.openFoldersByPath[path]?.[folderName],
-      };
+      state.currentDirectory = state.currentDirectory + action.payload;
+      state.navigationHistory.push(state.currentDirectory);
+      state.navigationHistoryIndex++;
     },
 
-    clearFileExplorerData: () => initialState,
+    navigateBackward: (state) => {
+      if (state.navigationHistoryIndex > 0) {
+        state.navigationHistoryIndex--;
+        state.currentDirectory =
+          state.navigationHistory[state.navigationHistoryIndex];
+      }
+    },
+
+    setSearchFileNameQuery: (state, action) => {
+      state.searchFileNameQuery = action.payload;
+    },
+
+    clearSearchFileNameQuery: (state) => {
+      state.searchFileNameQuery = "";
+    },
+
+    clearFileExplorerData: (state) => {
+      Object.assign(state, initialState);
+    },
   },
   extraReducers: (builder) => {
+    const setPending = (state) => {
+      state.isLoading = true;
+      state.success = undefined;
+      state.error = null;
+    };
+
+    const setFulfilled = (state, action) => {
+      const { path, status, data } = action.payload;
+
+      state.isLoading = false;
+      state.success = status;
+      state.pathData = status ? data : [];
+      state.error = status ? null : data;
+    };
+
+    const setRejected = (state, action) => {
+      state.isLoading = false;
+      state.success = false;
+      state.error = action.error.message || action.error;
+    };
+
     builder
-      .addCase(fetchCompanyStorageData.pending, (state, action) => {
-        state.loadingByPath[action.meta.arg.path] = true;
-      })
-      .addCase(fetchCompanyStorageData.fulfilled, (state, action) => {
-        const { path, status, data } = action.payload;
+      .addCase(fetchCompanyStorageData.pending, setPending)
+      .addCase(fetchCompanyStorageData.fulfilled, setFulfilled)
+      .addCase(fetchCompanyStorageData.rejected, setRejected)
 
-        state.loadingByPath[action.meta.arg.path] = false;
-        state.successByPath[action.meta.arg.path] = status;
+      .addCase(changeDirectoryAndFetchCompanyStorageData.pending, setPending)
+      .addCase(
+        changeDirectoryAndFetchCompanyStorageData.fulfilled,
+        setFulfilled,
+      )
+      .addCase(changeDirectoryAndFetchCompanyStorageData.rejected, setRejected)
 
-        if (status) {
-          state.errorByPath[action.meta.arg.path] = null;
-          state.dataByPath[path] = data;
-        } else {
-          state.errorByPath[action.meta.arg.path] = data;
-        }
-      })
-      .addCase(fetchCompanyStorageData.rejected, (state, action) => {
-        state.loadingByPath[action.meta.arg.path] = false;
-        state.successByPath[action.meta.arg.path] = false;
-        state.errorByPath[action.meta.arg.path] =
-          action.error.message || action.error;
-      });
+      .addCase(navigateBackwardAndFetchCompanyStorageData.pending, setPending)
+      .addCase(
+        navigateBackwardAndFetchCompanyStorageData.fulfilled,
+        setFulfilled,
+      )
+      .addCase(
+        navigateBackwardAndFetchCompanyStorageData.rejected,
+        setRejected,
+      );
   },
 });
 
-//
-export const selectDataByPath = (path) =>
-  createSelector(
-    (state) => state.fileExplorer.dataByPath,
-    (dataByPath) => dataByPath[path] || [],
-  );
-
-export const { toggleFolder, clearFileExplorerData } =
-  fileExplorerSlice.actions;
+export const {
+  goToDirectory,
+  navigateBackward,
+  setSearchFileNameQuery,
+  clearSearchFileNameQuery,
+  clearFileExplorerData,
+} = fileExplorerSlice.actions;
 
 export default fileExplorerSlice.reducer;

@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   companiesToShow: "all", // "all", || "awaiting" || "published"
   selectedCompanyId: null,
+  searchCompanyNameQuery: "",
   companyInfoActiveTab: "overview",
 };
 
@@ -18,6 +19,13 @@ const companiesSlice = createSlice({
       state.selectedCompanyId = action.payload;
     },
 
+    setSearchCompanyNameQuery: (state, action) => {
+      state.searchCompanyNameQuery = action.payload;
+
+      // Clear selected company whenever the search query changes
+      state.selectedCompanyId = null;
+    },
+
     setCompanyInfoActiveTab: (state, action) => {
       state.companyInfoActiveTab = action.payload;
     },
@@ -29,6 +37,7 @@ const companiesSlice = createSlice({
 export const {
   setCompaniesToShow,
   setSelectedCompanyId,
+  setSearchCompanyNameQuery,
   setCompanyInfoActiveTab,
   clearCompaniesData,
 } = companiesSlice.actions;

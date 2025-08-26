@@ -1,21 +1,23 @@
-import fileIcon from "@assets/images/icon_file.svg";
-import connectFolderAndFileIcon from "@assets/images/icon_connect-folder-and-file.svg";
+import { cn, formatDateTime } from "@/lib/utils";
 
-function PathDataFileItem({ type, size, name, mod_time }) {
+import fileIcon from "@assets/images/icon_file.svg";
+
+function PathDataFileItem({ name, size, mod_time, className }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-1">
-        <span className="inline-block h-[18px] w-[9px] flex-shrink-0 -translate-y-1/2">
-          <img
-            src={connectFolderAndFileIcon}
-            alt="Connect folder and file icon"
-          />
-        </span>
+    <div
+      className={cn(
+        "grid grid-cols-[1fr_140px_45px] gap-3 text-[14px] text-white",
+        className,
+      )}
+    >
+      <div className="flex items-center gap-3">
         <span className="inline-block h-[17px] w-[20px] flex-shrink-0">
           <img src={fileIcon} alt="File icon" />
         </span>
+        <span>{name}</span>
       </div>
-      <span className="text-[14px] text-white">{name}</span>
+      <span>{formatDateTime(mod_time)}</span>
+      <span>{size}</span>
     </div>
   );
 }

@@ -1,24 +1,43 @@
-import folderIcon from "@assets/images/icon_folder.svg";
-import connectFolderAndFileIcon from "@assets/images/icon_connect-folder-and-file.svg";
+import { useDispatch, useSelector } from "react-redux";
 
-function PathDataFolderItem({ type, size, name, mod_time, onToggleFolder }) {
+import { changeDirectoryAndFetchCompanyStorageData } from "@/store/fileExplorerSlice";
+
+import { cn, formatDateTime } from "@/lib/utils";
+
+import folderIcon from "@assets/images/icon_folder.svg";
+
+function PathDataFolderItem({ name, size, mod_time, className }) {
+  const dispath = useDispatch();
+
+  const { selectedCompanyId } = useSelector((state) => state.companies);
+
+  function handleDirectoryClick() {
+    console.log("handleDirectoryClick", selectedCompanyId);
+
+    dispath(
+      changeDirectoryAndFetchCompanyStorageData({
+        companyId: selectedCompanyId,
+        path: `/${name}`,
+      }),
+    );
+  }
+
   return (
     <div
-      className="flex max-w-min cursor-pointer items-center gap-3"
-      onClick={onToggleFolder}
+      className={cn(
+        "grid grid-cols-[1fr_140px_45px] gap-3 text-[14px] text-white",
+        className,
+      )}
+      onClick={handleDirectoryClick}
     >
-      <div className="flex items-center gap-1">
-        <span className="inline-block h-[18px] w-[9px] flex-shrink-0 -translate-y-1/2">
-          <img
-            src={connectFolderAndFileIcon}
-            alt="Connect folder and file icon"
-          />
-        </span>
+      <div className="flex cursor-pointer items-center gap-3">
         <span className="inline-block h-[17px] w-[22px] flex-shrink-0">
           <img src={folderIcon} alt="Folder icon" />
         </span>
+        <span className="">{name}</span>
       </div>
-      <span className="text-[14px] text-white">{name}</span>
+      <span>{formatDateTime(mod_time)}</span>
+      <span>{size || "-"}</span>
     </div>
   );
 }

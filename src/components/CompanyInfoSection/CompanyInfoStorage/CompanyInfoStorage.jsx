@@ -7,7 +7,7 @@ function CompanyInfoStorage() {
   const { selectedCompanyId } = useSelector((state) => state.companies);
 
   return (
-    <div className="flex h-full flex-col gap-4 pt-2">
+    <div className="flex h-full flex-col gap-4 overflow-auto pt-2">
       {/* Search  */}
       <StorageSearch />
 
@@ -24,7 +24,7 @@ function CompanyInfoStorage() {
       {selectedCompanyId ? (
         <StorageFileExplorer companyId={selectedCompanyId} />
       ) : (
-        <div className="ml-4 flex h-full w-full flex-grow">
+        <div className="flex h-full w-full flex-grow pl-4">
           <div className="flex h-full w-full items-center justify-center bg-[#0c0c0c]">
             <h3 className="text-[21px] text-white">No Date</h3>
           </div>

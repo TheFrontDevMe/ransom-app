@@ -105,3 +105,18 @@ export function getCountdown(expiryTimestamp) {
   // Less than 24 hours remaining
   return [`${pad(hours)}h:${pad(minutes)}m`, true];
 }
+
+//
+export function formatDateTime(dateTime) {
+  const date = new Date(dateTime);
+
+  const formatter = new Intl.DateTimeFormat("sv-SE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return formatter.format(date);
+}
